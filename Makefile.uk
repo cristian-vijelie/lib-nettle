@@ -1,0 +1,303 @@
+$(eval $(call addlib_s,libnettle,$(CONFIG_LIBNETTLE)))
+
+LIBNETTLE_VERSION=3.6
+LIBNETTLE_TARNAME=nettle-$(LIBNETTLE_VERSION)
+LIBNETTLE_URL=https://ftp.gnu.org/gnu/nettle/$(LIBNETTLE_TARNAME).tar.gz
+$(eval $(call fetch,libnettle,$(LIBNETTLE_URL)))
+
+LIBNETTLE_PATCHDIR=$(LIBNETTLE_BASE)/patches
+
+LIBNETTLE_SUBDIR = $(LIBNETTLE_ORIGIN)/nettle-$(LIBNETTLE_VERSION)
+
+LIBNETTLE_CFLAGS += -I. -I$(LIBNETTLE_BASE)/include -DHAVE_CONFIG_H -g -O2 -ggdb3 -Wall -W -Wno-sign-compare   -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes   -Wpointer-arith -Wbad-function-cast -Wnested-externs -fpic 
+
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-table.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-invert-internal.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-key-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-encrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-set-encrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-set-encrypt-key.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-set-encrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arcfour.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arcfour-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arctwo.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arctwo-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/blowfish.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-encode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-decode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-encode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-decode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-encode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-decode.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/buffer.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/buffer-init.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-table.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-absorb.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-invert-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-set-encrypt-key.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia192-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-set-encrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-set-decrypt-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cast128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cast128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cbc.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes192.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cfb.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac-aes256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cnd-memcpy.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-core-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-poly1305.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-poly1305-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-set-nonce.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ctr.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ctr16.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/des.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/des3.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax-aes128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes192.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes192-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac64.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-des3.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes128-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-des3-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gost28147.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gosthash94.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gosthash94-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-gosthash94.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-md5.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-ripemd160.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha1.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha224.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha384.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha512.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-md5-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-ripemd160-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha1-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha224-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha384-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha512-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/knuth-lfib.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hkdf.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md2.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md2-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md4.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md4-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compress.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compat.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memeql-sec.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor3.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-lookup-hash.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-aeads.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-armors.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-ciphers.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-hashes.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-macs.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-gosthash94.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-sha1.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-sha256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-aes.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/realloc.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160-compress.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-core-internal.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20r12-crypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-set-nonce.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-128-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-256-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-compress.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-compress.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha224-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-compress.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha384-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-224-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-permute.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-224.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-224-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-256-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-384.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-384-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-512.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-512-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/shake256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-encrypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-decrypt.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/twofish.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/twofish-meta.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh-n.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-l2.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-l3.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-poly64.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-poly128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-set-key.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac32.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac64.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac96.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/version.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-be32.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-le32.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-le64.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/yarrow256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/yarrow_key_event.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes128.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes256.c
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-core-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compress.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor3.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-core-internal.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-crypt.s 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-compress.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-compress.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-compress.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-permute.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-encrypt.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-decrypt.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh-n.s
+LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-hash8.s
+
+# Run ./configure
+$(LIBNETTLE_SUBDIR)/.configured: $(LIBNETTLE_BUILD)/.origin
+	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && ./configure && touch $@)
+
+# Prepare assembly files
+
+LIBNETTLE_ASSEMBLY_DEPS = $(LIBNETTLE_SUBDIR)/asm.m4 $(LIBNETTLE_SUBDIR)/machine.m4 $(LIBNETTLE_SUBDIR)/config.m4
+
+$(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/chacha-core-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/chacha-core-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/md5-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/md5-compress.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/memxor.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/memxor.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/memxor3.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/memxor3.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/poly1305-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/poly1305-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/salsa20-core-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/salsa20-core-internal.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/salsa20-crypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/salsa20-crypt.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/sha1-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha1-compress.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/sha256-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha256-compress.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/sha512-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha512-compress.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/sha3-permute.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha3-permute.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/serpent-encrypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/serpent-encrypt.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/serpent-decrypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/serpent-decrypt.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/umac-nh.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/umac-nh.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), d $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/umac-nh-n.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/umac-nh-n.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+$(LIBNETTLE_SUBDIR)/gcm-hash8.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/gcm-hash8.asm
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
+
+LIBNETTLE_PREPAED_DEPS = \
+    $(LIBNETTLE_SUBDIR)/.configured \
+    $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s \
+    $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s \
+    $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s \
+    $(LIBNETTLE_SUBDIR)/chacha-core-internal.s \
+    $(LIBNETTLE_SUBDIR)/md5-compress.s \
+    $(LIBNETTLE_SUBDIR)/memxor.s \
+    $(LIBNETTLE_SUBDIR)/memxor3.s \
+    $(LIBNETTLE_SUBDIR)/poly1305-internal.s \
+    $(LIBNETTLE_SUBDIR)/salsa20-core-internal.s \
+    $(LIBNETTLE_SUBDIR)/salsa20-crypt.s \
+    $(LIBNETTLE_SUBDIR)/sha1-compress.s \
+    $(LIBNETTLE_SUBDIR)/sha256-compress.s \
+    $(LIBNETTLE_SUBDIR)/sha512-compress.s \
+    $(LIBNETTLE_SUBDIR)/sha3-permute.s \
+    $(LIBNETTLE_SUBDIR)/serpent-encrypt.s \
+    $(LIBNETTLE_SUBDIR)/serpent-decrypt.s \
+    $(LIBNETTLE_SUBDIR)/umac-nh.s \
+    $(LIBNETTLE_SUBDIR)/umac-nh-n.s \
+    $(LIBNETTLE_SUBDIR)/gcm-hash8.s \
+
+$(LIBNETTLE_BUILD)/.prepared : $(LIBNETTLE_PREPAED_DEPS)
+    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) touch $@)
+
+UK_PREPARE += $(LIBNETTLE_BUILD)/.prepared
