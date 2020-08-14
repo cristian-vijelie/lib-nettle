@@ -3,6 +3,7 @@ From: Cristian Vijelie <cristianvijelie@gmail.com>
 Date: Thu, 13 Aug 2020 15:17:52 +0300
 Subject: [UNIKRAFT/LIBNETTLE 1/4] First port of libnettle
 
+Signed-off-by: Cristian Vijelie <cristianvijelie@gmail.com>
 ---
  .gitignore                 |   1 +
  Config.uk                  |   4 +

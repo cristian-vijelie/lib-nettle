@@ -3,6 +3,7 @@ From: Cristian Vijelie <cristianvijelie@gmail.com>
 Date: Fri, 14 Aug 2020 13:42:38 +0300
 Subject: [UNIKRAFT/LIBNETTLE 4/4] Added .md files
 
+Signed-off-by: Cristian Vijelie <cristianvijelie@gmail.com>
 ---
  CODING_STYLE.md |  4 ++++
  CONTRIBUTING.md |  4 ++++
