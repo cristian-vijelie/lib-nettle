@@ -1,0 +1,120 @@
+From a39dbab2768c1b7122548fc950677222142f7801 Mon Sep 17 00:00:00 2001
+From: Cristian Vijelie <cristianvijelie@gmail.com>
+Date: Fri, 14 Aug 2020 13:42:38 +0300
+Subject: [UNIKRAFT/LIBNETTLE 4/4] Added .md files
+
+---
+ CODING_STYLE.md |  4 ++++
+ CONTRIBUTING.md |  4 ++++
+ MAINTAINERS.md  |  9 +++++++++
+ Makefile.uk     | 21 +++++++++++++++++++--
+ README.md       |  6 ++++++
+ 5 files changed, 42 insertions(+), 2 deletions(-)
+ create mode 100644 CODING_STYLE.md
+ create mode 100644 CONTRIBUTING.md
+ create mode 100644 MAINTAINERS.md
+ create mode 100644 README.md
+
+diff --git a/CODING_STYLE.md b/CODING_STYLE.md
+new file mode 100644
+index 0000000..5730041
+--- /dev/null
++++ b/CODING_STYLE.md
+@@ -0,0 +1,4 @@
++Coding Style
++============
++
++Please refer to the `CODING_STYLE.md` file in the main Unikraft repository.
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+new file mode 100644
+index 0000000..14f6ac6
+--- /dev/null
++++ b/CONTRIBUTING.md
+@@ -0,0 +1,4 @@
++Contributing to Unikraft
++========================
++
++Please refer to the `CONTRIBUTING.md` file in the main Unikraft repository.
+diff --git a/MAINTAINERS.md b/MAINTAINERS.md
+new file mode 100644
+index 0000000..c123f15
+--- /dev/null
++++ b/MAINTAINERS.md
+@@ -0,0 +1,9 @@
++Maintainers List
++================
++
++For notes on how to read this information, please refer to `MAINTAINERS.md` in
++the main Unikraft repository.
++
++	LIBNETTLE-UNIKRAFT
++	L:	minios-devel@lists.xen.org
++	F: *
+diff --git a/Makefile.uk b/Makefile.uk
+index 460a078..18139ef 100644
+--- a/Makefile.uk
++++ b/Makefile.uk
+@@ -1,17 +1,31 @@
++################################################################################
++# Library registration
++################################################################################
+ $(eval $(call addlib_s,libnettle,$(CONFIG_LIBNETTLE)))
+ 
++################################################################################
++# Original sources
++################################################################################
+ LIBNETTLE_VERSION=3.6
+ LIBNETTLE_ZIPNAME=nettle-$(LIBNETTLE_VERSION)
+ LIBNETTLE_URL=https://ftp.gnu.org/gnu/nettle/$(LIBNETTLE_ZIPNAME).tar.gz
+ $(eval $(call fetch,libnettle,$(LIBNETTLE_URL)))
+-
+ LIBNETTLE_PATCHDIR=$(LIBNETTLE_BASE)/patches
+ $(eval $(call patch,libnettle,$(LIBNETTLE_PATCHDIR),$(LIBNETTLE_ZIPNAME)))
+ 
++################################################################################
++# Helpers
++################################################################################
+ LIBNETTLE_SUBDIR = $(LIBNETTLE_ORIGIN)/$(LIBNETTLE_ZIPNAME)
+ 
++################################################################################
++# Global flags
++################################################################################
+ LIBNETTLE_CFLAGS = -I. -I$(LIBNETTLE_BASE)/include -DHAVE_CONFIG_H -g -O2 -ggdb3 -Wall -W -Wno-sign-compare   -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes   -Wpointer-arith -Wbad-function-cast -Wnested-externs -fpic -MT $@ -MD -MP -MF $@.d
+ 
++################################################################################
++# Nettle code
++################################################################################
+ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s
+ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt.c
+ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s
+@@ -211,11 +225,14 @@ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes128.c
+ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes256.c
+ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-hash8.s
+ 
++################################################################################
++# Nettle prepare
++################################################################################
+ # Run ./configure
+ $(LIBNETTLE_SUBDIR)/.configured: $(LIBNETTLE_BUILD)/.origin
+ 	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && ./configure && touch $@)
+ 
+-# Prepare assembly files
++# Generate assembly files
+ 
+ LIBNETTLE_ASSEMBLY_DEPS = $(LIBNETTLE_SUBDIR)/asm.m4 $(LIBNETTLE_SUBDIR)/machine.m4 $(LIBNETTLE_SUBDIR)/config.m4
+ 
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..207d99a
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,6 @@
++Nettle crypto library for Unikraft
++=============================
++
++This is the port of Nettle crypto library for Unikraft as external library. 
++
++Please refer to the `README.md` as well as the documentation in the `doc/` subdirectory of the main unikraft repository.
+-- 
+2.25.1
+

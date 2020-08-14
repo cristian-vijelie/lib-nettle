@@ -1,0 +1,1806 @@
+From 104b605bf40241e5e04538b8b1480bc6fe5a62c8 Mon Sep 17 00:00:00 2001
+From: Cristian Vijelie <cristianvijelie@gmail.com>
+Date: Thu, 13 Aug 2020 15:17:52 +0300
+Subject: [UNIKRAFT/LIBNETTLE 1/4] First port of libnettle
+
+---
+ .gitignore                 |   1 +
+ Config.uk                  |   4 +
+ Makefile.uk                | 303 ++++++++++++++++++++++
+ include/alloca.h           |  40 +++
+ include/bits/long-double.h |  21 ++
+ include/bits/wordsize.h    |  17 ++
+ include/features.h         | 488 ++++++++++++++++++++++++++++++++++
+ include/gnu/stubs-32.h     |  18 ++
+ include/gnu/stubs-64.h     |  19 ++
+ include/gnu/stubs-x32.h    |  24 ++
+ include/gnu/stubs.h        |  14 +
+ include/limits.h           | 149 +++++++++++
+ include/stdc-predef.h      |  60 +++++
+ include/stddef.h           |   0
+ include/sys/cdefs.h        | 517 +++++++++++++++++++++++++++++++++++++
+ 15 files changed, 1675 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 Config.uk
+ create mode 100644 Makefile.uk
+ create mode 100644 include/alloca.h
+ create mode 100644 include/bits/long-double.h
+ create mode 100644 include/bits/wordsize.h
+ create mode 100644 include/features.h
+ create mode 100644 include/gnu/stubs-32.h
+ create mode 100644 include/gnu/stubs-64.h
+ create mode 100644 include/gnu/stubs-x32.h
+ create mode 100644 include/gnu/stubs.h
+ create mode 100644 include/limits.h
+ create mode 100644 include/stdc-predef.h
+ create mode 100644 include/stddef.h
+ create mode 100644 include/sys/cdefs.h
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..4dcb82f
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1 @@
++nettle-*
+\ No newline at end of file
+diff --git a/Config.uk b/Config.uk
+new file mode 100644
+index 0000000..10e212c
+--- /dev/null
++++ b/Config.uk
+@@ -0,0 +1,4 @@
++menuconfig LIBNETTLE
++    bool "libnettle: Symmetric and one-way cryptographic library"
++    select LIBNOLIBC if !HAVE_LIBC
++    default n
+\ No newline at end of file
+diff --git a/Makefile.uk b/Makefile.uk
+new file mode 100644
+index 0000000..408d246
+--- /dev/null
++++ b/Makefile.uk
+@@ -0,0 +1,303 @@
++$(eval $(call addlib_s,libnettle,$(CONFIG_LIBNETTLE)))
++
++LIBNETTLE_VERSION=3.6
++LIBNETTLE_TARNAME=nettle-$(LIBNETTLE_VERSION)
++LIBNETTLE_URL=https://ftp.gnu.org/gnu/nettle/$(LIBNETTLE_TARNAME).tar.gz
++$(eval $(call fetch,libnettle,$(LIBNETTLE_URL)))
++
++LIBNETTLE_PATCHDIR=$(LIBNETTLE_BASE)/patches
++
++LIBNETTLE_SUBDIR = $(LIBNETTLE_ORIGIN)/nettle-$(LIBNETTLE_VERSION)
++
++LIBNETTLE_CFLAGS += -I. -I$(LIBNETTLE_BASE)/include -DHAVE_CONFIG_H -g -O2 -ggdb3 -Wall -W -Wno-sign-compare   -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes   -Wpointer-arith -Wbad-function-cast -Wnested-externs -fpic 
++
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-table.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-invert-internal.c 
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-key-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-encrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-set-encrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-set-encrypt-key.c 
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes192-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-set-encrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arcfour.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arcfour-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arctwo.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/arctwo-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/blowfish.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-encode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-decode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base16-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-encode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-decode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-encode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-decode.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/base64url-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/buffer.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/buffer-init.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-table.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-absorb.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-invert-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-set-encrypt-key.c 
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia192-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-set-encrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-set-decrypt-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cast128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cast128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cbc.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes192.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ccm-aes256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cfb.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/siv-cmac-aes256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cnd-memcpy.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-core-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-poly1305.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-poly1305-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-set-nonce.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ctr.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ctr16.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/des.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/des3.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/eax-aes128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes192.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes192-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-aes256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-camellia256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac64.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-des3.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes128-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-aes256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/cmac-des3-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gost28147.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gosthash94.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gosthash94-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-gosthash94.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-md5.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-ripemd160.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha1.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha224.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha384.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha512.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-md5-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-ripemd160-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha1-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha224-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha384-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hmac-sha512-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/knuth-lfib.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/hkdf.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md2.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md2-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md4.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md4-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compress.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compat.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memeql-sec.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor3.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-lookup-hash.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-aeads.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-armors.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-ciphers.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-hashes.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/nettle-meta-macs.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-gosthash94.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-sha1.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/pbkdf2-hmac-sha256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-aes.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/realloc.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160-compress.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/ripemd160-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-core-internal.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20r12-crypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-set-nonce.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-128-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-256-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-compress.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-compress.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha224-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-compress.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha384-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-224-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-permute.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-224.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-224-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-256-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-384.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-384-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-512.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-512-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/shake256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-encrypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-decrypt.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/twofish.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/twofish-meta.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh-n.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-l2.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-l3.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-poly64.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-poly128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-set-key.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac32.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac64.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac96.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/version.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-be32.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-le32.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/write-le64.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/yarrow256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/yarrow_key_event.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes128.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes256.c
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/chacha-core-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/md5-compress.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/memxor3.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/poly1305-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-core-internal.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/salsa20-crypt.s 
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha1-compress.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha256-compress.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha512-compress.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/sha3-permute.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-encrypt.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/serpent-decrypt.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/umac-nh-n.s
++LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-hash8.s
++
++# Run ./configure
++$(LIBNETTLE_SUBDIR)/.configured: $(LIBNETTLE_BUILD)/.origin
++	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && ./configure && touch $@)
++
++# Prepare assembly files
++
++LIBNETTLE_ASSEMBLY_DEPS = $(LIBNETTLE_SUBDIR)/asm.m4 $(LIBNETTLE_SUBDIR)/machine.m4 $(LIBNETTLE_SUBDIR)/config.m4
++
++$(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/chacha-core-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/chacha-core-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/md5-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/md5-compress.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/memxor.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/memxor.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/memxor3.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/memxor3.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/poly1305-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/poly1305-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/salsa20-core-internal.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/salsa20-core-internal.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/salsa20-crypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/salsa20-crypt.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/sha1-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha1-compress.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/sha256-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha256-compress.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/sha512-compress.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha512-compress.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/sha3-permute.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/sha3-permute.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/serpent-encrypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/serpent-encrypt.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/serpent-decrypt.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/serpent-decrypt.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/umac-nh.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/umac-nh.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), d $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/umac-nh-n.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/umac-nh-n.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++$(LIBNETTLE_SUBDIR)/gcm-hash8.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_SUBDIR)/gcm-hash8.asm
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && /usr/bin/m4 $^ >$@)
++
++LIBNETTLE_PREPAED_DEPS = \
++    $(LIBNETTLE_SUBDIR)/.configured \
++    $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s \
++    $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s \
++    $(LIBNETTLE_SUBDIR)/camellia-crypt-internal.s \
++    $(LIBNETTLE_SUBDIR)/chacha-core-internal.s \
++    $(LIBNETTLE_SUBDIR)/md5-compress.s \
++    $(LIBNETTLE_SUBDIR)/memxor.s \
++    $(LIBNETTLE_SUBDIR)/memxor3.s \
++    $(LIBNETTLE_SUBDIR)/poly1305-internal.s \
++    $(LIBNETTLE_SUBDIR)/salsa20-core-internal.s \
++    $(LIBNETTLE_SUBDIR)/salsa20-crypt.s \
++    $(LIBNETTLE_SUBDIR)/sha1-compress.s \
++    $(LIBNETTLE_SUBDIR)/sha256-compress.s \
++    $(LIBNETTLE_SUBDIR)/sha512-compress.s \
++    $(LIBNETTLE_SUBDIR)/sha3-permute.s \
++    $(LIBNETTLE_SUBDIR)/serpent-encrypt.s \
++    $(LIBNETTLE_SUBDIR)/serpent-decrypt.s \
++    $(LIBNETTLE_SUBDIR)/umac-nh.s \
++    $(LIBNETTLE_SUBDIR)/umac-nh-n.s \
++    $(LIBNETTLE_SUBDIR)/gcm-hash8.s \
++
++$(LIBNETTLE_BUILD)/.prepared : $(LIBNETTLE_PREPAED_DEPS)
++    $(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) touch $@)
++
++UK_PREPARE += $(LIBNETTLE_BUILD)/.prepared
+diff --git a/include/alloca.h b/include/alloca.h
+new file mode 100644
+index 0000000..bd44688
+--- /dev/null
++++ b/include/alloca.h
+@@ -0,0 +1,40 @@
++/* Copyright (C) 1992-2020 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef	_ALLOCA_H
++#define	_ALLOCA_H	1
++
++#include <features.h>
++
++#define	__need_size_t
++#include <stddef.h>
++
++__BEGIN_DECLS
++
++/* Remove any previous definitions.  */
++#undef	alloca
++
++/* Allocate a block that will be freed when the calling function exits.  */
++extern void *alloca (size_t __size) __THROW;
++
++#ifdef	__GNUC__
++# define alloca(size)	__builtin_alloca (size)
++#endif /* GCC.  */
++
++__END_DECLS
++
++#endif /* alloca.h */
+diff --git a/include/bits/long-double.h b/include/bits/long-double.h
+new file mode 100644
+index 0000000..b77124f
+--- /dev/null
++++ b/include/bits/long-double.h
+@@ -0,0 +1,21 @@
++/* Properties of long double type.  ldbl-96 version.
++   Copyright (C) 2016-2020 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License  published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++/* long double is distinct from double, so there is nothing to
++   define here.  */
++#define __LONG_DOUBLE_USES_FLOAT128 0
+diff --git a/include/bits/wordsize.h b/include/bits/wordsize.h
+new file mode 100644
+index 0000000..70f652b
+--- /dev/null
++++ b/include/bits/wordsize.h
+@@ -0,0 +1,17 @@
++/* Determine the wordsize from the preprocessor defines.  */
++
++#if defined __x86_64__ && !defined __ILP32__
++# define __WORDSIZE	64
++#else
++# define __WORDSIZE	32
++#define __WORDSIZE32_SIZE_ULONG		0
++#define __WORDSIZE32_PTRDIFF_LONG	0
++#endif
++
++#ifdef __x86_64__
++# define __WORDSIZE_TIME64_COMPAT32	1
++/* Both x86-64 and x32 use the 64-bit system call interface.  */
++# define __SYSCALL_WORDSIZE		64
++#else
++# define __WORDSIZE_TIME64_COMPAT32	0
++#endif
+diff --git a/include/features.h b/include/features.h
+new file mode 100644
+index 0000000..f334777
+--- /dev/null
++++ b/include/features.h
+@@ -0,0 +1,488 @@
++/* Copyright (C) 1991-2020 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef	_FEATURES_H
++#define	_FEATURES_H	1
++
++/* These are defined by the user (or the compiler)
++   to specify the desired environment:
++
++   __STRICT_ANSI__	ISO Standard C.
++   _ISOC99_SOURCE	Extensions to ISO C89 from ISO C99.
++   _ISOC11_SOURCE	Extensions to ISO C99 from ISO C11.
++   _ISOC2X_SOURCE	Extensions to ISO C99 from ISO C2X.
++   __STDC_WANT_LIB_EXT2__
++			Extensions to ISO C99 from TR 27431-2:2010.
++   __STDC_WANT_IEC_60559_BFP_EXT__
++			Extensions to ISO C11 from TS 18661-1:2014.
++   __STDC_WANT_IEC_60559_FUNCS_EXT__
++			Extensions to ISO C11 from TS 18661-4:2015.
++   __STDC_WANT_IEC_60559_TYPES_EXT__
++			Extensions to ISO C11 from TS 18661-3:2015.
++
++   _POSIX_SOURCE	IEEE Std 1003.1.
++   _POSIX_C_SOURCE	If ==1, like _POSIX_SOURCE; if >=2 add IEEE Std 1003.2;
++			if >=199309L, add IEEE Std 1003.1b-1993;
++			if >=199506L, add IEEE Std 1003.1c-1995;
++			if >=200112L, all of IEEE 1003.1-2004
++			if >=200809L, all of IEEE 1003.1-2008
++   _XOPEN_SOURCE	Includes POSIX and XPG things.  Set to 500 if
++			Single Unix conformance is wanted, to 600 for the
++			sixth revision, to 700 for the seventh revision.
++   _XOPEN_SOURCE_EXTENDED XPG things and X/Open Unix extensions.
++   _LARGEFILE_SOURCE	Some more functions for correct standard I/O.
++   _LARGEFILE64_SOURCE	Additional functionality from LFS for large files.
++   _FILE_OFFSET_BITS=N	Select default filesystem interface.
++   _ATFILE_SOURCE	Additional *at interfaces.
++   _GNU_SOURCE		All of the above, plus GNU extensions.
++   _DEFAULT_SOURCE	The default set of features (taking precedence over
++			__STRICT_ANSI__).
++
++   _FORTIFY_SOURCE	Add security hardening to many library functions.
++			Set to 1 or 2; 2 performs stricter checks than 1.
++
++   _REENTRANT, _THREAD_SAFE
++			Obsolete; equivalent to _POSIX_C_SOURCE=199506L.
++
++   The `-ansi' switch to the GNU C compiler, and standards conformance
++   options such as `-std=c99', define __STRICT_ANSI__.  If none of
++   these are defined, or if _DEFAULT_SOURCE is defined, the default is
++   to have _POSIX_SOURCE set to one and _POSIX_C_SOURCE set to
++   200809L, as well as enabling miscellaneous functions from BSD and
++   SVID.  If more than one of these are defined, they accumulate.  For
++   example __STRICT_ANSI__, _POSIX_SOURCE and _POSIX_C_SOURCE together
++   give you ISO C, 1003.1, and 1003.2, but nothing else.
++
++   These are defined by this file and are used by the
++   header files to decide what to declare or define:
++
++   __GLIBC_USE (F)	Define things from feature set F.  This is defined
++			to 1 or 0; the subsequent macros are either defined
++			or undefined, and those tests should be moved to
++			__GLIBC_USE.
++   __USE_ISOC11		Define ISO C11 things.
++   __USE_ISOC99		Define ISO C99 things.
++   __USE_ISOC95		Define ISO C90 AMD1 (C95) things.
++   __USE_ISOCXX11	Define ISO C++11 things.
++   __USE_POSIX		Define IEEE Std 1003.1 things.
++   __USE_POSIX2		Define IEEE Std 1003.2 things.
++   __USE_POSIX199309	Define IEEE Std 1003.1, and .1b things.
++   __USE_POSIX199506	Define IEEE Std 1003.1, .1b, .1c and .1i things.
++   __USE_XOPEN		Define XPG things.
++   __USE_XOPEN_EXTENDED	Define X/Open Unix things.
++   __USE_UNIX98		Define Single Unix V2 things.
++   __USE_XOPEN2K        Define XPG6 things.
++   __USE_XOPEN2KXSI     Define XPG6 XSI things.
++   __USE_XOPEN2K8       Define XPG7 things.
++   __USE_XOPEN2K8XSI    Define XPG7 XSI things.
++   __USE_LARGEFILE	Define correct standard I/O things.
++   __USE_LARGEFILE64	Define LFS things with separate names.
++   __USE_FILE_OFFSET64	Define 64bit interface as default.
++   __USE_MISC		Define things from 4.3BSD or System V Unix.
++   __USE_ATFILE		Define *at interfaces and AT_* constants for them.
++   __USE_GNU		Define GNU extensions.
++   __USE_FORTIFY_LEVEL	Additional security measures used, according to level.
++
++   The macros `__GNU_LIBRARY__', `__GLIBC__', and `__GLIBC_MINOR__' are
++   defined by this file unconditionally.  `__GNU_LIBRARY__' is provided
++   only for compatibility.  All new code should use the other symbols
++   to test for features.
++
++   All macros listed above as possibly being defined by this file are
++   explicitly undefined if they are not explicitly defined.
++   Feature-test macros that are not defined by the user or compiler
++   but are implied by the other feature-test macros defined (or by the
++   lack of any definitions) are defined by the file.
++
++   ISO C feature test macros depend on the definition of the macro
++   when an affected header is included, not when the first system
++   header is included, and so they are handled in
++   <bits/libc-header-start.h>, which does not have a multiple include
++   guard.  Feature test macros that can be handled from the first
++   system header included are handled here.  */
++
++
++/* Undefine everything, so we get a clean slate.  */
++#undef	__USE_ISOC11
++#undef	__USE_ISOC99
++#undef	__USE_ISOC95
++#undef	__USE_ISOCXX11
++#undef	__USE_POSIX
++#undef	__USE_POSIX2
++#undef	__USE_POSIX199309
++#undef	__USE_POSIX199506
++#undef	__USE_XOPEN
++#undef	__USE_XOPEN_EXTENDED
++#undef	__USE_UNIX98
++#undef	__USE_XOPEN2K
++#undef	__USE_XOPEN2KXSI
++#undef	__USE_XOPEN2K8
++#undef	__USE_XOPEN2K8XSI
++#undef	__USE_LARGEFILE
++#undef	__USE_LARGEFILE64
++#undef	__USE_FILE_OFFSET64
++#undef	__USE_MISC
++#undef	__USE_ATFILE
++#undef	__USE_GNU
++#undef	__USE_FORTIFY_LEVEL
++#undef	__KERNEL_STRICT_NAMES
++#undef	__GLIBC_USE_ISOC2X
++#undef	__GLIBC_USE_DEPRECATED_GETS
++#undef	__GLIBC_USE_DEPRECATED_SCANF
++
++/* Suppress kernel-name space pollution unless user expressedly asks
++   for it.  */
++#ifndef _LOOSE_KERNEL_NAMES
++# define __KERNEL_STRICT_NAMES
++#endif
++
++/* Convenience macro to test the version of gcc.
++   Use like this:
++   #if __GNUC_PREREQ (2,8)
++   ... code requiring gcc 2.8 or later ...
++   #endif
++   Note: only works for GCC 2.0 and later, because __GNUC_MINOR__ was
++   added in 2.0.  */
++#if defined __GNUC__ && defined __GNUC_MINOR__
++# define __GNUC_PREREQ(maj, min) \
++	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
++#else
++# define __GNUC_PREREQ(maj, min) 0
++#endif
++
++/* Similarly for clang.  Features added to GCC after version 4.2 may
++   or may not also be available in clang, and clang's definitions of
++   __GNUC(_MINOR)__ are fixed at 4 and 2 respectively.  Not all such
++   features can be queried via __has_extension/__has_feature.  */
++#if defined __clang_major__ && defined __clang_minor__
++# define __glibc_clang_prereq(maj, min) \
++  ((__clang_major__ << 16) + __clang_minor__ >= ((maj) << 16) + (min))
++#else
++# define __glibc_clang_prereq(maj, min) 0
++#endif
++
++/* Whether to use feature set F.  */
++#define __GLIBC_USE(F)	__GLIBC_USE_ ## F
++
++/* _BSD_SOURCE and _SVID_SOURCE are deprecated aliases for
++   _DEFAULT_SOURCE.  If _DEFAULT_SOURCE is present we do not
++   issue a warning; the expectation is that the source is being
++   transitioned to use the new macro.  */
++#if (defined _BSD_SOURCE || defined _SVID_SOURCE) \
++    && !defined _DEFAULT_SOURCE
++# warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
++# undef  _DEFAULT_SOURCE
++# define _DEFAULT_SOURCE	1
++#endif
++
++/* If _GNU_SOURCE was defined by the user, turn on all the other features.  */
++#ifdef _GNU_SOURCE
++# undef  _ISOC95_SOURCE
++# define _ISOC95_SOURCE	1
++# undef  _ISOC99_SOURCE
++# define _ISOC99_SOURCE	1
++# undef  _ISOC11_SOURCE
++# define _ISOC11_SOURCE	1
++# undef  _ISOC2X_SOURCE
++# define _ISOC2X_SOURCE	1
++# undef  _POSIX_SOURCE
++# define _POSIX_SOURCE	1
++# undef  _POSIX_C_SOURCE
++# define _POSIX_C_SOURCE	200809L
++# undef  _XOPEN_SOURCE
++# define _XOPEN_SOURCE	700
++# undef  _XOPEN_SOURCE_EXTENDED
++# define _XOPEN_SOURCE_EXTENDED	1
++# undef	 _LARGEFILE64_SOURCE
++# define _LARGEFILE64_SOURCE	1
++# undef  _DEFAULT_SOURCE
++# define _DEFAULT_SOURCE	1
++# undef  _ATFILE_SOURCE
++# define _ATFILE_SOURCE	1
++#endif
++
++/* If nothing (other than _GNU_SOURCE and _DEFAULT_SOURCE) is defined,
++   define _DEFAULT_SOURCE.  */
++#if (defined _DEFAULT_SOURCE					\
++     || (!defined __STRICT_ANSI__				\
++	 && !defined _ISOC99_SOURCE && !defined _ISOC11_SOURCE	\
++	 && !defined _ISOC2X_SOURCE				\
++	 && !defined _POSIX_SOURCE && !defined _POSIX_C_SOURCE	\
++	 && !defined _XOPEN_SOURCE))
++# undef  _DEFAULT_SOURCE
++# define _DEFAULT_SOURCE	1
++#endif
++
++/* This is to enable the ISO C2X extension.  */
++#if (defined _ISOC2X_SOURCE \
++     || (defined __STDC_VERSION__ && __STDC_VERSION__ > 201710L))
++# define __GLIBC_USE_ISOC2X	1
++#else
++# define __GLIBC_USE_ISOC2X	0
++#endif
++
++/* This is to enable the ISO C11 extension.  */
++#if (defined _ISOC11_SOURCE || defined _ISOC2X_SOURCE \
++     || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L))
++# define __USE_ISOC11	1
++#endif
++
++/* This is to enable the ISO C99 extension.  */
++#if (defined _ISOC99_SOURCE || defined _ISOC11_SOURCE			\
++     || defined _ISOC2X_SOURCE						\
++     || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L))
++# define __USE_ISOC99	1
++#endif
++
++/* This is to enable the ISO C90 Amendment 1:1995 extension.  */
++#if (defined _ISOC99_SOURCE || defined _ISOC11_SOURCE			\
++     || defined _ISOC2X_SOURCE						\
++     || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199409L))
++# define __USE_ISOC95	1
++#endif
++
++#ifdef __cplusplus
++/* This is to enable compatibility for ISO C++17.  */
++# if __cplusplus >= 201703L
++#  define __USE_ISOC11	1
++# endif
++/* This is to enable compatibility for ISO C++11.
++   Check the temporary macro for now, too.  */
++# if __cplusplus >= 201103L || defined __GXX_EXPERIMENTAL_CXX0X__
++#  define __USE_ISOCXX11	1
++#  define __USE_ISOC99	1
++# endif
++#endif
++
++/* If none of the ANSI/POSIX macros are defined, or if _DEFAULT_SOURCE
++   is defined, use POSIX.1-2008 (or another version depending on
++   _XOPEN_SOURCE).  */
++#ifdef _DEFAULT_SOURCE
++# if !defined _POSIX_SOURCE && !defined _POSIX_C_SOURCE
++#  define __USE_POSIX_IMPLICITLY	1
++# endif
++# undef  _POSIX_SOURCE
++# define _POSIX_SOURCE	1
++# undef  _POSIX_C_SOURCE
++# define _POSIX_C_SOURCE	200809L
++#endif
++
++#if ((!defined __STRICT_ANSI__					\
++      || (defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) >= 500))	\
++     && !defined _POSIX_SOURCE && !defined _POSIX_C_SOURCE)
++# define _POSIX_SOURCE	1
++# if defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 500
++#  define _POSIX_C_SOURCE	2
++# elif defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 600
++#  define _POSIX_C_SOURCE	199506L
++# elif defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) < 700
++#  define _POSIX_C_SOURCE	200112L
++# else
++#  define _POSIX_C_SOURCE	200809L
++# endif
++# define __USE_POSIX_IMPLICITLY	1
++#endif
++
++/* Some C libraries once required _REENTRANT and/or _THREAD_SAFE to be
++   defined in all multithreaded code.  GNU libc has not required this
++   for many years.  We now treat them as compatibility synonyms for
++   _POSIX_C_SOURCE=199506L, which is the earliest level of POSIX with
++   comprehensive support for multithreaded code.  Using them never
++   lowers the selected level of POSIX conformance, only raises it.  */
++#if ((!defined _POSIX_C_SOURCE || (_POSIX_C_SOURCE - 0) < 199506L) \
++     && (defined _REENTRANT || defined _THREAD_SAFE))
++# define _POSIX_SOURCE   1
++# undef  _POSIX_C_SOURCE
++# define _POSIX_C_SOURCE 199506L
++#endif
++
++#if (defined _POSIX_SOURCE					\
++     || (defined _POSIX_C_SOURCE && _POSIX_C_SOURCE >= 1)	\
++     || defined _XOPEN_SOURCE)
++# define __USE_POSIX	1
++#endif
++
++#if defined _POSIX_C_SOURCE && _POSIX_C_SOURCE >= 2 || defined _XOPEN_SOURCE
++# define __USE_POSIX2	1
++#endif
++
++#if defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE - 0) >= 199309L
++# define __USE_POSIX199309	1
++#endif
++
++#if defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE - 0) >= 199506L
++# define __USE_POSIX199506	1
++#endif
++
++#if defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE - 0) >= 200112L
++# define __USE_XOPEN2K		1
++# undef __USE_ISOC95
++# define __USE_ISOC95		1
++# undef __USE_ISOC99
++# define __USE_ISOC99		1
++#endif
++
++#if defined _POSIX_C_SOURCE && (_POSIX_C_SOURCE - 0) >= 200809L
++# define __USE_XOPEN2K8		1
++# undef  _ATFILE_SOURCE
++# define _ATFILE_SOURCE	1
++#endif
++
++#ifdef	_XOPEN_SOURCE
++# define __USE_XOPEN	1
++# if (_XOPEN_SOURCE - 0) >= 500
++#  define __USE_XOPEN_EXTENDED	1
++#  define __USE_UNIX98	1
++#  undef _LARGEFILE_SOURCE
++#  define _LARGEFILE_SOURCE	1
++#  if (_XOPEN_SOURCE - 0) >= 600
++#   if (_XOPEN_SOURCE - 0) >= 700
++#    define __USE_XOPEN2K8	1
++#    define __USE_XOPEN2K8XSI	1
++#   endif
++#   define __USE_XOPEN2K	1
++#   define __USE_XOPEN2KXSI	1
++#   undef __USE_ISOC95
++#   define __USE_ISOC95		1
++#   undef __USE_ISOC99
++#   define __USE_ISOC99		1
++#  endif
++# else
++#  ifdef _XOPEN_SOURCE_EXTENDED
++#   define __USE_XOPEN_EXTENDED	1
++#  endif
++# endif
++#endif
++
++#ifdef _LARGEFILE_SOURCE
++# define __USE_LARGEFILE	1
++#endif
++
++#ifdef _LARGEFILE64_SOURCE
++# define __USE_LARGEFILE64	1
++#endif
++
++#if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
++# define __USE_FILE_OFFSET64	1
++#endif
++
++#if defined _DEFAULT_SOURCE
++# define __USE_MISC	1
++#endif
++
++#ifdef	_ATFILE_SOURCE
++# define __USE_ATFILE	1
++#endif
++
++#ifdef	_GNU_SOURCE
++# define __USE_GNU	1
++#endif
++
++#if defined _FORTIFY_SOURCE && _FORTIFY_SOURCE > 0 \
++    && __GNUC_PREREQ (4, 1) && defined __OPTIMIZE__ && __OPTIMIZE__ > 0
++# if _FORTIFY_SOURCE > 1
++#  define __USE_FORTIFY_LEVEL 2
++# else
++#  define __USE_FORTIFY_LEVEL 1
++# endif
++#else
++# define __USE_FORTIFY_LEVEL 0
++#endif
++
++/* The function 'gets' existed in C89, but is impossible to use
++   safely.  It has been removed from ISO C11 and ISO C++14.  Note: for
++   compatibility with various implementations of <cstdio>, this test
++   must consider only the value of __cplusplus when compiling C++.  */
++#if defined __cplusplus ? __cplusplus >= 201402L : defined __USE_ISOC11
++# define __GLIBC_USE_DEPRECATED_GETS 0
++#else
++# define __GLIBC_USE_DEPRECATED_GETS 1
++#endif
++
++/* GNU formerly extended the scanf functions with modified format
++   specifiers %as, %aS, and %a[...] that allocate a buffer for the
++   input using malloc.  This extension conflicts with ISO C99, which
++   defines %a as a standalone format specifier that reads a floating-
++   point number; moreover, POSIX.1-2008 provides the same feature
++   using the modifier letter 'm' instead (%ms, %mS, %m[...]).
++
++   We now follow C99 unless GNU extensions are active and the compiler
++   is specifically in C89 or C++98 mode (strict or not).  For
++   instance, with GCC, -std=gnu11 will have C99-compliant scanf with
++   or without -D_GNU_SOURCE, but -std=c89 -D_GNU_SOURCE will have the
++   old extension.  */
++#if (defined __USE_GNU							\
++     && (defined __cplusplus						\
++	 ? (__cplusplus < 201103L && !defined __GXX_EXPERIMENTAL_CXX0X__) \
++	 : (!defined __STDC_VERSION__ || __STDC_VERSION__ < 199901L)))
++# define __GLIBC_USE_DEPRECATED_SCANF 1
++#else
++# define __GLIBC_USE_DEPRECATED_SCANF 0
++#endif
++
++/* Get definitions of __STDC_* predefined macros, if the compiler has
++   not preincluded this header automatically.  */
++#include <stdc-predef.h>
++
++/* This macro indicates that the installed library is the GNU C Library.
++   For historic reasons the value now is 6 and this will stay from now
++   on.  The use of this variable is deprecated.  Use __GLIBC__ and
++   __GLIBC_MINOR__ now (see below) when you want to test for a specific
++   GNU C library version and use the values in <gnu/lib-names.h> to get
++   the sonames of the shared libraries.  */
++#undef  __GNU_LIBRARY__
++#define __GNU_LIBRARY__ 6
++
++/* Major and minor version number of the GNU C library package.  Use
++   these macros to test for features in specific releases.  */
++#define	__GLIBC__	2
++#define	__GLIBC_MINOR__	31
++
++#define __GLIBC_PREREQ(maj, min) \
++	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
++
++/* This is here only because every header file already includes this one.  */
++#ifndef __ASSEMBLER__
++# ifndef _SYS_CDEFS_H
++#  include <sys/cdefs.h>
++# endif
++
++/* If we don't have __REDIRECT, prototypes will be missing if
++   __USE_FILE_OFFSET64 but not __USE_LARGEFILE[64]. */
++# if defined __USE_FILE_OFFSET64 && !defined __REDIRECT
++#  define __USE_LARGEFILE	1
++#  define __USE_LARGEFILE64	1
++# endif
++
++#endif	/* !ASSEMBLER */
++
++/* Decide whether we can define 'extern inline' functions in headers.  */
++#if __GNUC_PREREQ (2, 7) && defined __OPTIMIZE__ \
++    && !defined __OPTIMIZE_SIZE__ && !defined __NO_INLINE__ \
++    && defined __extern_inline
++# define __USE_EXTERN_INLINES	1
++#endif
++
++
++/* This is here only because every header file already includes this one.
++   Get the definitions of all the appropriate `__stub_FUNCTION' symbols.
++   <gnu/stubs.h> contains `#define __stub_FUNCTION' when FUNCTION is a stub
++   that will always return failure (and set errno to ENOSYS).  */
++#include <gnu/stubs.h>
++
++
++#endif	/* features.h  */
+diff --git a/include/gnu/stubs-32.h b/include/gnu/stubs-32.h
+new file mode 100644
+index 0000000..9a304f4
+--- /dev/null
++++ b/include/gnu/stubs-32.h
+@@ -0,0 +1,18 @@
++/* This file is automatically generated.
++   It defines a symbol `__stub_FUNCTION' for each function
++   in the C library which is a stub, meaning it will fail
++   every time called, usually setting errno to ENOSYS.  */
++
++#ifdef _LIBC
++# error Applications may not define the macro _LIBC
++#endif
++
++#define __stub_chflags
++#define __stub_fchflags
++#define __stub_gtty
++#define __stub_lchmod
++#define __stub_revoke
++#define __stub_setlogin
++#define __stub_sigreturn
++#define __stub_sstk
++#define __stub_stty
+diff --git a/include/gnu/stubs-64.h b/include/gnu/stubs-64.h
+new file mode 100644
+index 0000000..4f9c4ba
+--- /dev/null
++++ b/include/gnu/stubs-64.h
+@@ -0,0 +1,19 @@
++/* This file is automatically generated.
++   It defines a symbol `__stub_FUNCTION' for each function
++   in the C library which is a stub, meaning it will fail
++   every time called, usually setting errno to ENOSYS.  */
++
++#ifdef _LIBC
++# error Applications may not define the macro _LIBC
++#endif
++
++#define __stub___compat_bdflush
++#define __stub_chflags
++#define __stub_fchflags
++#define __stub_gtty
++#define __stub_lchmod
++#define __stub_revoke
++#define __stub_setlogin
++#define __stub_sigreturn
++#define __stub_sstk
++#define __stub_stty
+diff --git a/include/gnu/stubs-x32.h b/include/gnu/stubs-x32.h
+new file mode 100644
+index 0000000..5421416
+--- /dev/null
++++ b/include/gnu/stubs-x32.h
+@@ -0,0 +1,24 @@
++/* This file is automatically generated.
++   It defines a symbol `__stub_FUNCTION' for each function
++   in the C library which is a stub, meaning it will fail
++   every time called, usually setting errno to ENOSYS.  */
++
++#ifdef _LIBC
++# error Applications may not define the macro _LIBC
++#endif
++
++#define __stub___compat_bdflush
++#define __stub___compat_create_module
++#define __stub___compat_get_kernel_syms
++#define __stub___compat_nfsservctl
++#define __stub___compat_query_module
++#define __stub___compat_uselib
++#define __stub_chflags
++#define __stub_fchflags
++#define __stub_gtty
++#define __stub_lchmod
++#define __stub_revoke
++#define __stub_setlogin
++#define __stub_sigreturn
++#define __stub_sstk
++#define __stub_stty
+diff --git a/include/gnu/stubs.h b/include/gnu/stubs.h
+new file mode 100644
+index 0000000..70a1ba0
+--- /dev/null
++++ b/include/gnu/stubs.h
+@@ -0,0 +1,14 @@
++/* This file is automatically generated.
++   This file selects the right generated file of `__stub_FUNCTION' macros
++   based on the architecture being compiled for.  */
++
++
++#if !defined __x86_64__
++# include <gnu/stubs-32.h>
++#endif
++#if defined __x86_64__ && defined __LP64__
++# include <gnu/stubs-64.h>
++#endif
++#if defined __x86_64__ && defined __ILP32__
++# include <gnu/stubs-x32.h>
++#endif
+diff --git a/include/limits.h b/include/limits.h
+new file mode 100644
+index 0000000..1c9c030
+--- /dev/null
++++ b/include/limits.h
+@@ -0,0 +1,149 @@
++/* Copyright (C) 1991, 1992, 1996, 1997, 1998, 1999, 2000, 2005
++   Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++/*
++ *        ISO C99 Standard: 7.10/5.2.4.2.1 Sizes of integer types        <limits.h>
++ */
++
++#ifndef _LIBC_LIMITS_H_
++#define _LIBC_LIMITS_H_        1
++
++#include <features.h>
++
++
++/* Maximum length of any multibyte character in any locale.
++   We define this value here since the gcc header does not define
++   the correct value.  */
++#define MB_LEN_MAX        16
++
++
++/* If we are not using GNU CC we have to define all the symbols ourself.
++   Otherwise use gcc's definitions (see below).  */
++
++
++/* We only protect from multiple inclusion here, because all the other
++   #include's protect themselves, and in GCC 2 we may #include_next through
++   multiple copies of this file before we get to GCC's.  */
++# ifndef _LIMITS_H
++#  define _LIMITS_H        1
++
++#include <bits/wordsize.h>
++
++/* We don't have #include_next.
++   Define ANSI <limits.h> for standard 32-bit words.  */
++
++/* These assume 8-bit `char's, 16-bit `short int's,
++   and 32-bit `int's and `long int's.  */
++
++/* Number of bits in a `char'.        */
++#  define CHAR_BIT        8
++
++/* Minimum and maximum values a `signed char' can hold.  */
++#  define SCHAR_MIN        (-128)
++#  define SCHAR_MAX        127
++
++/* Maximum value an `unsigned char' can hold.  (Minimum is 0.)  */
++#  define UCHAR_MAX        255
++
++/* Minimum and maximum values a `char' can hold.  */
++#  ifdef __CHAR_UNSIGNED__
++#   define CHAR_MIN        0
++#   define CHAR_MAX        UCHAR_MAX
++#  else
++#   define CHAR_MIN        SCHAR_MIN
++#   define CHAR_MAX        SCHAR_MAX
++#  endif
++
++/* Minimum and maximum values a `signed short int' can hold.  */
++#  define SHRT_MIN        (-32768)
++#  define SHRT_MAX        32767
++
++/* Maximum value an `unsigned short int' can hold.  (Minimum is 0.)  */
++#  define USHRT_MAX        65535
++
++/* Minimum and maximum values a `signed int' can hold.  */
++#  define INT_MIN        (-INT_MAX - 1)
++#  define INT_MAX        2147483647
++
++/* Maximum value an `unsigned int' can hold.  (Minimum is 0.)  */
++#  define UINT_MAX        4294967295U
++
++/* Minimum and maximum values a `signed long int' can hold.  */
++#  if __WORDSIZE == 64
++#   define LONG_MAX        9223372036854775807L
++#  else
++#   define LONG_MAX        2147483647L
++#  endif
++#  define LONG_MIN        (-LONG_MAX - 1L)
++
++/* Maximum value an `unsigned long int' can hold.  (Minimum is 0.)  */
++#  if __WORDSIZE == 64
++#   define ULONG_MAX        18446744073709551615UL
++#  else
++#   define ULONG_MAX        4294967295UL
++#  endif
++
++#  ifdef __USE_ISOC99
++
++/* Minimum and maximum values a `signed long long int' can hold.  */
++#   define LLONG_MAX        9223372036854775807LL
++#   define LLONG_MIN        (-LLONG_MAX - 1LL)
++
++/* Maximum value an `unsigned long long int' can hold.  (Minimum is 0.)  */
++#   define ULLONG_MAX        18446744073709551615ULL
++
++#  endif /* ISO C99 */
++
++# endif        /* limits.h  */
++
++#endif        /* !_LIBC_LIMITS_H_ */
++
++ /* Get the compiler's limits.h, which defines almost all the ISO constants.
++
++    We put this #include_next outside the double inclusion check because
++    it should be possible to include this file more than once and still get
++    the definitions from gcc's header.  */
++
++/* The <limits.h> files in some gcc versions don't define LLONG_MIN,
++   LLONG_MAX, and ULLONG_MAX.  Instead only the values gcc defined for
++   ages are available.  */
++#if defined __USE_ISOC99 && defined __GNUC__
++# ifndef LLONG_MIN
++#  define LLONG_MIN        (-LLONG_MAX-1)
++# endif
++# ifndef LLONG_MAX
++#  define LLONG_MAX        __LONG_LONG_MAX__
++# endif
++# ifndef ULLONG_MAX
++#  define ULLONG_MAX        (LLONG_MAX * 2ULL + 1)
++# endif
++#endif
++
++#ifdef        __USE_POSIX
++/* POSIX adds things to <limits.h>.  */
++# include <bits/posix1_lim.h>
++#endif
++
++#ifdef        __USE_POSIX2
++# include <bits/posix2_lim.h>
++#endif
++
++#ifdef        __USE_XOPEN
++# include <bits/xopen_lim.h>
++#endif
+\ No newline at end of file
+diff --git a/include/stdc-predef.h b/include/stdc-predef.h
+new file mode 100644
+index 0000000..eaf0a6a
+--- /dev/null
++++ b/include/stdc-predef.h
+@@ -0,0 +1,60 @@
++/* Copyright (C) 1991-2020 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef	_STDC_PREDEF_H
++#define	_STDC_PREDEF_H	1
++
++/* This header is separate from features.h so that the compiler can
++   include it implicitly at the start of every compilation.  It must
++   not itself include <features.h> or any other header that includes
++   <features.h> because the implicit include comes before any feature
++   test macros that may be defined in a source file before it first
++   explicitly includes a system header.  GCC knows the name of this
++   header in order to preinclude it.  */
++
++/* glibc's intent is to support the IEC 559 math functionality, real
++   and complex.  If the GCC (4.9 and later) predefined macros
++   specifying compiler intent are available, use them to determine
++   whether the overall intent is to support these features; otherwise,
++   presume an older compiler has intent to support these features and
++   define these macros by default.  */
++
++#ifdef __GCC_IEC_559
++# if __GCC_IEC_559 > 0
++#  define __STDC_IEC_559__		1
++# endif
++#else
++# define __STDC_IEC_559__		1
++#endif
++
++#ifdef __GCC_IEC_559_COMPLEX
++# if __GCC_IEC_559_COMPLEX > 0
++#  define __STDC_IEC_559_COMPLEX__	1
++# endif
++#else
++# define __STDC_IEC_559_COMPLEX__	1
++#endif
++
++/* wchar_t uses Unicode 10.0.0.  Version 10.0 of the Unicode Standard is
++   synchronized with ISO/IEC 10646:2017, fifth edition, plus
++   the following additions from Amendment 1 to the fifth edition:
++   - 56 emoji characters
++   - 285 hentaigana
++   - 3 additional Zanabazar Square characters */
++#define __STDC_ISO_10646__		201706L
++
++#endif
+diff --git a/include/stddef.h b/include/stddef.h
+new file mode 100644
+index 0000000..e69de29
+diff --git a/include/sys/cdefs.h b/include/sys/cdefs.h
+new file mode 100644
+index 0000000..ff7144f
+--- /dev/null
++++ b/include/sys/cdefs.h
+@@ -0,0 +1,517 @@
++/* Copyright (C) 1992-2020 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, see
++   <https://www.gnu.org/licenses/>.  */
++
++#ifndef	_SYS_CDEFS_H
++#define	_SYS_CDEFS_H	1
++
++/* We are almost always included from features.h. */
++#ifndef _FEATURES_H
++# include <features.h>
++#endif
++
++/* The GNU libc does not support any K&R compilers or the traditional mode
++   of ISO C compilers anymore.  Check for some of the combinations not
++   anymore supported.  */
++#if defined __GNUC__ && !defined __STDC__
++# error "You need a ISO C conforming compiler to use the glibc headers"
++#endif
++
++/* Some user header file might have defined this before.  */
++#undef	__P
++#undef	__PMT
++
++#ifdef __GNUC__
++
++/* All functions, except those with callbacks or those that
++   synchronize memory, are leaf functions.  */
++# if __GNUC_PREREQ (4, 6) && !defined _LIBC
++#  define __LEAF , __leaf__
++#  define __LEAF_ATTR __attribute__ ((__leaf__))
++# else
++#  define __LEAF
++#  define __LEAF_ATTR
++# endif
++
++/* GCC can always grok prototypes.  For C++ programs we add throw()
++   to help it optimize the function calls.  But this works only with
++   gcc 2.8.x and egcs.  For gcc 3.2 and up we even mark C functions
++   as non-throwing using a function attribute since programs can use
++   the -fexceptions options for C code as well.  */
++# if !defined __cplusplus && __GNUC_PREREQ (3, 3)
++#  define __THROW	__attribute__ ((__nothrow__ __LEAF))
++#  define __THROWNL	__attribute__ ((__nothrow__))
++#  define __NTH(fct)	__attribute__ ((__nothrow__ __LEAF)) fct
++#  define __NTHNL(fct)  __attribute__ ((__nothrow__)) fct
++# else
++#  if defined __cplusplus && __GNUC_PREREQ (2,8)
++#   define __THROW	throw ()
++#   define __THROWNL	throw ()
++#   define __NTH(fct)	__LEAF_ATTR fct throw ()
++#   define __NTHNL(fct) fct throw ()
++#  else
++#   define __THROW
++#   define __THROWNL
++#   define __NTH(fct)	fct
++#   define __NTHNL(fct) fct
++#  endif
++# endif
++
++#else	/* Not GCC.  */
++
++# if (defined __cplusplus						\
++      || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L))
++#  define __inline	inline
++# else
++#  define __inline		/* No inline functions.  */
++# endif
++
++# define __THROW
++# define __THROWNL
++# define __NTH(fct)	fct
++
++#endif	/* GCC.  */
++
++/* Compilers that are not clang may object to
++       #if defined __clang__ && __has_extension(...)
++   even though they do not need to evaluate the right-hand side of the &&.  */
++#if defined __clang__ && defined __has_extension
++# define __glibc_clang_has_extension(ext) __has_extension (ext)
++#else
++# define __glibc_clang_has_extension(ext) 0
++#endif
++
++/* These two macros are not used in glibc anymore.  They are kept here
++   only because some other projects expect the macros to be defined.  */
++#define __P(args)	args
++#define __PMT(args)	args
++
++/* For these things, GCC behaves the ANSI way normally,
++   and the non-ANSI way under -traditional.  */
++
++#define __CONCAT(x,y)	x ## y
++#define __STRING(x)	#x
++
++/* This is not a typedef so `const __ptr_t' does the right thing.  */
++#define __ptr_t void *
++
++
++/* C++ needs to know that types and declarations are C, not C++.  */
++#ifdef	__cplusplus
++# define __BEGIN_DECLS	extern "C" {
++# define __END_DECLS	}
++#else
++# define __BEGIN_DECLS
++# define __END_DECLS
++#endif
++
++
++/* Fortify support.  */
++#define __bos(ptr) __builtin_object_size (ptr, __USE_FORTIFY_LEVEL > 1)
++#define __bos0(ptr) __builtin_object_size (ptr, 0)
++
++#if __GNUC_PREREQ (4,3)
++# define __warndecl(name, msg) \
++  extern void name (void) __attribute__((__warning__ (msg)))
++# define __warnattr(msg) __attribute__((__warning__ (msg)))
++# define __errordecl(name, msg) \
++  extern void name (void) __attribute__((__error__ (msg)))
++#else
++# define __warndecl(name, msg) extern void name (void)
++# define __warnattr(msg)
++# define __errordecl(name, msg) extern void name (void)
++#endif
++
++/* Support for flexible arrays.
++   Headers that should use flexible arrays only if they're "real"
++   (e.g. only if they won't affect sizeof()) should test
++   #if __glibc_c99_flexarr_available.  */
++#if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
++# define __flexarr	[]
++# define __glibc_c99_flexarr_available 1
++#elif __GNUC_PREREQ (2,97)
++/* GCC 2.97 supports C99 flexible array members as an extension,
++   even when in C89 mode or compiling C++ (any version).  */
++# define __flexarr	[]
++# define __glibc_c99_flexarr_available 1
++#elif defined __GNUC__
++/* Pre-2.97 GCC did not support C99 flexible arrays but did have
++   an equivalent extension with slightly different notation.  */
++# define __flexarr	[0]
++# define __glibc_c99_flexarr_available 1
++#else
++/* Some other non-C99 compiler.  Approximate with [1].  */
++# define __flexarr	[1]
++# define __glibc_c99_flexarr_available 0
++#endif
++
++
++/* __asm__ ("xyz") is used throughout the headers to rename functions
++   at the assembly language level.  This is wrapped by the __REDIRECT
++   macro, in order to support compilers that can do this some other
++   way.  When compilers don't support asm-names at all, we have to do
++   preprocessor tricks instead (which don't have exactly the right
++   semantics, but it's the best we can do).
++
++   Example:
++   int __REDIRECT(setpgrp, (__pid_t pid, __pid_t pgrp), setpgid); */
++
++#if defined __GNUC__ && __GNUC__ >= 2
++
++# define __REDIRECT(name, proto, alias) name proto __asm__ (__ASMNAME (#alias))
++# ifdef __cplusplus
++#  define __REDIRECT_NTH(name, proto, alias) \
++     name proto __THROW __asm__ (__ASMNAME (#alias))
++#  define __REDIRECT_NTHNL(name, proto, alias) \
++     name proto __THROWNL __asm__ (__ASMNAME (#alias))
++# else
++#  define __REDIRECT_NTH(name, proto, alias) \
++     name proto __asm__ (__ASMNAME (#alias)) __THROW
++#  define __REDIRECT_NTHNL(name, proto, alias) \
++     name proto __asm__ (__ASMNAME (#alias)) __THROWNL
++# endif
++# define __ASMNAME(cname)  __ASMNAME2 (__USER_LABEL_PREFIX__, cname)
++# define __ASMNAME2(prefix, cname) __STRING (prefix) cname
++
++/*
++#elif __SOME_OTHER_COMPILER__
++
++# define __REDIRECT(name, proto, alias) name proto; \
++	_Pragma("let " #name " = " #alias)
++*/
++#endif
++
++/* GCC has various useful declarations that can be made with the
++   `__attribute__' syntax.  All of the ways we use this do fine if
++   they are omitted for compilers that don't understand it. */
++#if !defined __GNUC__ || __GNUC__ < 2
++# define __attribute__(xyz)	/* Ignore */
++#endif
++
++/* At some point during the gcc 2.96 development the `malloc' attribute
++   for functions was introduced.  We don't want to use it unconditionally
++   (although this would be possible) since it generates warnings.  */
++#if __GNUC_PREREQ (2,96)
++# define __attribute_malloc__ __attribute__ ((__malloc__))
++#else
++# define __attribute_malloc__ /* Ignore */
++#endif
++
++/* Tell the compiler which arguments to an allocation function
++   indicate the size of the allocation.  */
++#if __GNUC_PREREQ (4, 3)
++# define __attribute_alloc_size__(params) \
++  __attribute__ ((__alloc_size__ params))
++#else
++# define __attribute_alloc_size__(params) /* Ignore.  */
++#endif
++
++/* At some point during the gcc 2.96 development the `pure' attribute
++   for functions was introduced.  We don't want to use it unconditionally
++   (although this would be possible) since it generates warnings.  */
++#if __GNUC_PREREQ (2,96)
++# define __attribute_pure__ __attribute__ ((__pure__))
++#else
++# define __attribute_pure__ /* Ignore */
++#endif
++
++/* This declaration tells the compiler that the value is constant.  */
++#if __GNUC_PREREQ (2,5)
++# define __attribute_const__ __attribute__ ((__const__))
++#else
++# define __attribute_const__ /* Ignore */
++#endif
++
++/* At some point during the gcc 3.1 development the `used' attribute
++   for functions was introduced.  We don't want to use it unconditionally
++   (although this would be possible) since it generates warnings.  */
++#if __GNUC_PREREQ (3,1)
++# define __attribute_used__ __attribute__ ((__used__))
++# define __attribute_noinline__ __attribute__ ((__noinline__))
++#else
++# define __attribute_used__ __attribute__ ((__unused__))
++# define __attribute_noinline__ /* Ignore */
++#endif
++
++/* Since version 3.2, gcc allows marking deprecated functions.  */
++#if __GNUC_PREREQ (3,2)
++# define __attribute_deprecated__ __attribute__ ((__deprecated__))
++#else
++# define __attribute_deprecated__ /* Ignore */
++#endif
++
++/* Since version 4.5, gcc also allows one to specify the message printed
++   when a deprecated function is used.  clang claims to be gcc 4.2, but
++   may also support this feature.  */
++#if __GNUC_PREREQ (4,5) \
++    || __glibc_clang_has_extension (__attribute_deprecated_with_message__)
++# define __attribute_deprecated_msg__(msg) \
++	 __attribute__ ((__deprecated__ (msg)))
++#else
++# define __attribute_deprecated_msg__(msg) __attribute_deprecated__
++#endif
++
++/* At some point during the gcc 2.8 development the `format_arg' attribute
++   for functions was introduced.  We don't want to use it unconditionally
++   (although this would be possible) since it generates warnings.
++   If several `format_arg' attributes are given for the same function, in
++   gcc-3.0 and older, all but the last one are ignored.  In newer gccs,
++   all designated arguments are considered.  */
++#if __GNUC_PREREQ (2,8)
++# define __attribute_format_arg__(x) __attribute__ ((__format_arg__ (x)))
++#else
++# define __attribute_format_arg__(x) /* Ignore */
++#endif
++
++/* At some point during the gcc 2.97 development the `strfmon' format
++   attribute for functions was introduced.  We don't want to use it
++   unconditionally (although this would be possible) since it
++   generates warnings.  */
++#if __GNUC_PREREQ (2,97)
++# define __attribute_format_strfmon__(a,b) \
++  __attribute__ ((__format__ (__strfmon__, a, b)))
++#else
++# define __attribute_format_strfmon__(a,b) /* Ignore */
++#endif
++
++/* The nonull function attribute allows to mark pointer parameters which
++   must not be NULL.  */
++#if __GNUC_PREREQ (3,3)
++# define __nonnull(params) __attribute__ ((__nonnull__ params))
++#else
++# define __nonnull(params)
++#endif
++
++/* If fortification mode, we warn about unused results of certain
++   function calls which can lead to problems.  */
++#if __GNUC_PREREQ (3,4)
++# define __attribute_warn_unused_result__ \
++   __attribute__ ((__warn_unused_result__))
++# if __USE_FORTIFY_LEVEL > 0
++#  define __wur __attribute_warn_unused_result__
++# endif
++#else
++# define __attribute_warn_unused_result__ /* empty */
++#endif
++#ifndef __wur
++# define __wur /* Ignore */
++#endif
++
++/* Forces a function to be always inlined.  */
++#if __GNUC_PREREQ (3,2)
++/* The Linux kernel defines __always_inline in stddef.h (283d7573), and
++   it conflicts with this definition.  Therefore undefine it first to
++   allow either header to be included first.  */
++# undef __always_inline
++# define __always_inline __inline __attribute__ ((__always_inline__))
++#else
++# undef __always_inline
++# define __always_inline __inline
++#endif
++
++/* Associate error messages with the source location of the call site rather
++   than with the source location inside the function.  */
++#if __GNUC_PREREQ (4,3)
++# define __attribute_artificial__ __attribute__ ((__artificial__))
++#else
++# define __attribute_artificial__ /* Ignore */
++#endif
++
++/* GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
++   inline semantics, unless -fgnu89-inline is used.  Using __GNUC_STDC_INLINE__
++   or __GNUC_GNU_INLINE is not a good enough check for gcc because gcc versions
++   older than 4.3 may define these macros and still not guarantee GNU inlining
++   semantics.
++
++   clang++ identifies itself as gcc-4.2, but has support for GNU inlining
++   semantics, that can be checked for by using the __GNUC_STDC_INLINE_ and
++   __GNUC_GNU_INLINE__ macro definitions.  */
++#if (!defined __cplusplus || __GNUC_PREREQ (4,3) \
++     || (defined __clang__ && (defined __GNUC_STDC_INLINE__ \
++			       || defined __GNUC_GNU_INLINE__)))
++# if defined __GNUC_STDC_INLINE__ || defined __cplusplus
++#  define __extern_inline extern __inline __attribute__ ((__gnu_inline__))
++#  define __extern_always_inline \
++  extern __always_inline __attribute__ ((__gnu_inline__))
++# else
++#  define __extern_inline extern __inline
++#  define __extern_always_inline extern __always_inline
++# endif
++#endif
++
++#ifdef __extern_always_inline
++# define __fortify_function __extern_always_inline __attribute_artificial__
++#endif
++
++/* GCC 4.3 and above allow passing all anonymous arguments of an
++   __extern_always_inline function to some other vararg function.  */
++#if __GNUC_PREREQ (4,3)
++# define __va_arg_pack() __builtin_va_arg_pack ()
++# define __va_arg_pack_len() __builtin_va_arg_pack_len ()
++#endif
++
++/* It is possible to compile containing GCC extensions even if GCC is
++   run in pedantic mode if the uses are carefully marked using the
++   `__extension__' keyword.  But this is not generally available before
++   version 2.8.  */
++#if !__GNUC_PREREQ (2,8)
++# define __extension__		/* Ignore */
++#endif
++
++/* __restrict is known in EGCS 1.2 and above. */
++#if !__GNUC_PREREQ (2,92)
++# if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
++#  define __restrict	restrict
++# else
++#  define __restrict	/* Ignore */
++# endif
++#endif
++
++/* ISO C99 also allows to declare arrays as non-overlapping.  The syntax is
++     array_name[restrict]
++   GCC 3.1 supports this.  */
++#if __GNUC_PREREQ (3,1) && !defined __GNUG__
++# define __restrict_arr	__restrict
++#else
++# ifdef __GNUC__
++#  define __restrict_arr	/* Not supported in old GCC.  */
++# else
++#  if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
++#   define __restrict_arr	restrict
++#  else
++/* Some other non-C99 compiler.  */
++#   define __restrict_arr	/* Not supported.  */
++#  endif
++# endif
++#endif
++
++#if __GNUC__ >= 3
++# define __glibc_unlikely(cond)	__builtin_expect ((cond), 0)
++# define __glibc_likely(cond)	__builtin_expect ((cond), 1)
++#else
++# define __glibc_unlikely(cond)	(cond)
++# define __glibc_likely(cond)	(cond)
++#endif
++
++#ifdef __has_attribute
++# define __glibc_has_attribute(attr)	__has_attribute (attr)
++#else
++# define __glibc_has_attribute(attr)	0
++#endif
++
++#if (!defined _Noreturn \
++     && (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 201112 \
++     &&  !__GNUC_PREREQ (4,7))
++# if __GNUC_PREREQ (2,8)
++#  define _Noreturn __attribute__ ((__noreturn__))
++# else
++#  define _Noreturn
++# endif
++#endif
++
++#if __GNUC_PREREQ (8, 0)
++/* Describes a char array whose address can safely be passed as the first
++   argument to strncpy and strncat, as the char array is not necessarily
++   a NUL-terminated string.  */
++# define __attribute_nonstring__ __attribute__ ((__nonstring__))
++#else
++# define __attribute_nonstring__
++#endif
++
++/* Undefine (also defined in libc-symbols.h).  */
++#undef __attribute_copy__
++#if __GNUC_PREREQ (9, 0)
++/* Copies attributes from the declaration or type referenced by
++   the argument.  */
++# define __attribute_copy__(arg) __attribute__ ((__copy__ (arg)))
++#else
++# define __attribute_copy__(arg)
++#endif
++
++#if (!defined _Static_assert && !defined __cplusplus \
++     && (defined __STDC_VERSION__ ? __STDC_VERSION__ : 0) < 201112 \
++     && (!__GNUC_PREREQ (4, 6) || defined __STRICT_ANSI__))
++# define _Static_assert(expr, diagnostic) \
++    extern int (*__Static_assert_function (void)) \
++      [!!sizeof (struct { int __error_if_negative: (expr) ? 2 : -1; })]
++#endif
++
++#include <bits/wordsize.h>
++#include <bits/long-double.h>
++
++#if defined __LONG_DOUBLE_MATH_OPTIONAL && defined __NO_LONG_DOUBLE_MATH
++# define __LDBL_COMPAT 1
++# ifdef __REDIRECT
++#  define __LDBL_REDIR1(name, proto, alias) __REDIRECT (name, proto, alias)
++#  define __LDBL_REDIR(name, proto) \
++  __LDBL_REDIR1 (name, proto, __nldbl_##name)
++#  define __LDBL_REDIR1_NTH(name, proto, alias) __REDIRECT_NTH (name, proto, alias)
++#  define __LDBL_REDIR_NTH(name, proto) \
++  __LDBL_REDIR1_NTH (name, proto, __nldbl_##name)
++#  define __LDBL_REDIR1_DECL(name, alias) \
++  extern __typeof (name) name __asm (__ASMNAME (#alias));
++#  define __LDBL_REDIR_DECL(name) \
++  extern __typeof (name) name __asm (__ASMNAME ("__nldbl_" #name));
++#  define __REDIRECT_LDBL(name, proto, alias) \
++  __LDBL_REDIR1 (name, proto, __nldbl_##alias)
++#  define __REDIRECT_NTH_LDBL(name, proto, alias) \
++  __LDBL_REDIR1_NTH (name, proto, __nldbl_##alias)
++# endif
++#endif
++#if !defined __LDBL_COMPAT || !defined __REDIRECT
++# define __LDBL_REDIR1(name, proto, alias) name proto
++# define __LDBL_REDIR(name, proto) name proto
++# define __LDBL_REDIR1_NTH(name, proto, alias) name proto __THROW
++# define __LDBL_REDIR_NTH(name, proto) name proto __THROW
++# define __LDBL_REDIR_DECL(name)
++# ifdef __REDIRECT
++#  define __REDIRECT_LDBL(name, proto, alias) __REDIRECT (name, proto, alias)
++#  define __REDIRECT_NTH_LDBL(name, proto, alias) \
++  __REDIRECT_NTH (name, proto, alias)
++# endif
++#endif
++
++/* __glibc_macro_warning (MESSAGE) issues warning MESSAGE.  This is
++   intended for use in preprocessor macros.
++
++   Note: MESSAGE must be a _single_ string; concatenation of string
++   literals is not supported.  */
++#if __GNUC_PREREQ (4,8) || __glibc_clang_prereq (3,5)
++# define __glibc_macro_warning1(message) _Pragma (#message)
++# define __glibc_macro_warning(message) \
++  __glibc_macro_warning1 (GCC warning message)
++#else
++# define __glibc_macro_warning(msg)
++#endif
++
++/* Generic selection (ISO C11) is a C-only feature, available in GCC
++   since version 4.9.  Previous versions do not provide generic
++   selection, even though they might set __STDC_VERSION__ to 201112L,
++   when in -std=c11 mode.  Thus, we must check for !defined __GNUC__
++   when testing __STDC_VERSION__ for generic selection support.
++   On the other hand, Clang also defines __GNUC__, so a clang-specific
++   check is required to enable the use of generic selection.  */
++#if !defined __cplusplus \
++    && (__GNUC_PREREQ (4, 9) \
++	|| __glibc_clang_has_extension (c_generic_selections) \
++	|| (!defined __GNUC__ && defined __STDC_VERSION__ \
++	    && __STDC_VERSION__ >= 201112L))
++# define __HAVE_GENERIC_SELECTION 1
++#else
++# define __HAVE_GENERIC_SELECTION 0
++#endif
++
++#endif	 /* sys/cdefs.h */
+-- 
+2.25.1
+
