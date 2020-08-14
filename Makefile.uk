@@ -1,17 +1,31 @@
+################################################################################
+# Library registration
+################################################################################
 $(eval $(call addlib_s,libnettle,$(CONFIG_LIBNETTLE)))
 
+################################################################################
+# Original sources
+################################################################################
 LIBNETTLE_VERSION=3.6
 LIBNETTLE_ZIPNAME=nettle-$(LIBNETTLE_VERSION)
 LIBNETTLE_URL=https://ftp.gnu.org/gnu/nettle/$(LIBNETTLE_ZIPNAME).tar.gz
 $(eval $(call fetch,libnettle,$(LIBNETTLE_URL)))
-
 LIBNETTLE_PATCHDIR=$(LIBNETTLE_BASE)/patches
 $(eval $(call patch,libnettle,$(LIBNETTLE_PATCHDIR),$(LIBNETTLE_ZIPNAME)))
 
+################################################################################
+# Helpers
+################################################################################
 LIBNETTLE_SUBDIR = $(LIBNETTLE_ORIGIN)/$(LIBNETTLE_ZIPNAME)
 
+################################################################################
+# Global flags
+################################################################################
 LIBNETTLE_CFLAGS = -I. -I$(LIBNETTLE_BASE)/include -DHAVE_CONFIG_H -g -O2 -ggdb3 -Wall -W -Wno-sign-compare   -Wmissing-prototypes -Wmissing-declarations -Wstrict-prototypes   -Wpointer-arith -Wbad-function-cast -Wnested-externs -fpic -MT $@ -MD -MP -MF $@.d
 
+################################################################################
+# Nettle code
+################################################################################
 LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt-internal.s
 LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-decrypt.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/aes-encrypt-internal.s
@@ -211,11 +225,14 @@ LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes128.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/xts-aes256.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_SUBDIR)/gcm-hash8.s
 
+################################################################################
+# Nettle prepare
+################################################################################
 # Run ./configure
 $(LIBNETTLE_SUBDIR)/.configured: $(LIBNETTLE_BUILD)/.origin
 	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_SUBDIR) && ./configure && touch $@)
 
-# Prepare assembly files
+# Generate assembly files
 
 LIBNETTLE_ASSEMBLY_DEPS = $(LIBNETTLE_SUBDIR)/asm.m4 $(LIBNETTLE_SUBDIR)/machine.m4 $(LIBNETTLE_SUBDIR)/config.m4
 
