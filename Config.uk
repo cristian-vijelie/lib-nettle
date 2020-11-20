@@ -1,4 +1,4 @@
 menuconfig LIBNETTLE
     bool "libnettle: Symmetric and one-way cryptographic library"
     select LIBNEWLIBC
-    default n
+    default y

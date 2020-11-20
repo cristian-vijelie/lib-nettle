@@ -21,7 +21,7 @@ LIBNETTLE_DIR = $(LIBNETTLE_ORIGIN)/$(LIBNETTLE_TARNAME)
 ################################################################################
 # Library includes
 ################################################################################
-LIBNETTLE-CINCLUDES-y = -I$(LIBNETTLE_DIR) -I$(LIBNETTLE_BASE)/include
+LIBNETTLE-CINCLUDES-y = -I$(LIBNETTLE_DIR)
 
 ################################################################################
 # Global flags
@@ -39,14 +39,14 @@ LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-decrypt.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-encrypt-internal.s
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-encrypt.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-encrypt-table.c
-LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-invert-internal.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-invert-internal.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-set-key-internal.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-set-encrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes-set-decrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes128-set-encrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes128-set-decrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes128-meta.c
-LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes192-set-encrypt-key.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes192-set-encrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes192-set-decrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes192-meta.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/aes256-set-encrypt-key.c
@@ -72,7 +72,7 @@ LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia-crypt-internal.s
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia-table.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia-absorb.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia-invert-key.c
-LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia128-set-encrypt-key.c 
+LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia128-set-encrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia128-crypt.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia128-set-decrypt-key.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/camellia128-meta.c
@@ -283,7 +283,7 @@ $(LIBNETTLE_DIR)/umac-nh-n.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_DIR)/umac-n
 $(LIBNETTLE_DIR)/gcm-hash8.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_DIR)/gcm-hash8.asm
 	$(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && /usr/bin/m4 $^ >$@)
 
-LIBNETTLE_PREPAED_DEPS = \
+LIBNETTLE_PREPARED_DEPS = \
 	$(LIBNETTLE_DIR)/.configured \
 	$(LIBNETTLE_DIR)/aes-decrypt-internal.s \
 	$(LIBNETTLE_DIR)/aes-encrypt-internal.s \
@@ -303,9 +303,9 @@ LIBNETTLE_PREPAED_DEPS = \
 	$(LIBNETTLE_DIR)/serpent-decrypt.s \
 	$(LIBNETTLE_DIR)/umac-nh.s \
 	$(LIBNETTLE_DIR)/umac-nh-n.s \
-	$(LIBNETTLE_DIR)/gcm-hash8.s \
+	$(LIBNETTLE_DIR)/gcm-hash8.s
 
-$(LIBNETTLE_BUILD)/.prepared : $(LIBNETTLE_PREPAED_DEPS)
+$(LIBNETTLE_BUILD)/.prepared : $(LIBNETTLE_PREPARED_DEPS)
 	$(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && touch $@)
 
 UK_PREPARE += $(LIBNETTLE_BUILD)/.prepared
