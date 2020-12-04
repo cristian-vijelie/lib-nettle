@@ -9,8 +9,8 @@ of the test suite. So, for each test, a new executable is built. This cannot
 happen in unikraft.
 
 This patch removes the main() function from testutils.c and renames each
-test_main() function from the test sources to, so they all have different
-names. This way is possible to call all the functions from the testing app.
+test_main() function from the test sources, so they all have different names.
+This way is possible to call all the functions from the testing app.
 
 Signed-off-by: Cristian Vijelie <cristianvijelie@gmail.com>
 ---
