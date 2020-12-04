@@ -233,12 +233,71 @@ LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/xts-aes128.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/xts-aes256.c
 LIBNETTLE_SRCS-y += $(LIBNETTLE_DIR)/gcm-hash8.s
 
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/aes-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/arcfour-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/arctwo-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/base16-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/base64-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/blowfish-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/buffer-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/camellia-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/cast128-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/cbc-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/ccm-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/cfb-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/chacha-poly1305-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/chacha-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/cmac-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/ctr-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/des-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/des3-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/eax-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/gcm-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/gosthash94-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/hkdf-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/hmac-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/knuth-lfib-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/md2-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/md4-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/md5-compat-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/md5-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/meta-aead-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/meta-armor-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/meta-cipher-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/meta-hash-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/meta-mac-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/pbkdf2-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/poly1305-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/ripemd160-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/salsa20-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/serpent-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha1-huge-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha1-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha3-224-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha3-256-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha3-384-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha3-512-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha3-permute-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha224-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha256-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha384-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha512-224-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha512-256-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/sha512-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/shake256-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/twofish-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/umac-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/xts-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/yarrow-test.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/testutils.c
+LIBNETTLE_SRCS-$(CONFIG_LIBNETTLE_TEST) += $(LIBNETTLE_DIR)/nettle-internal.c
+
 ################################################################################
 # Nettle prepare
 ################################################################################
 # Run ./configure
 $(LIBNETTLE_DIR)/.configured: $(LIBNETTLE_BUILD)/.origin
-	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && ./configure && touch $@)
+	$(call verbose_cmd,CONFIG,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && ./configure && touch $@ && cp config.h testsuite/)
 
 # Generate assembly files
 
@@ -283,6 +342,70 @@ $(LIBNETTLE_DIR)/umac-nh-n.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_DIR)/umac-n
 $(LIBNETTLE_DIR)/gcm-hash8.s: $(LIBNETTLE_ASSEMBLY_DEPS) $(LIBNETTLE_DIR)/gcm-hash8.asm
 	$(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && /usr/bin/m4 $^ >$@)
 
+LIBNETTLE_TEST_SRCS = \
+	$(LIBNETTLE_DIR)/testsuite/aes-test.c \
+	$(LIBNETTLE_DIR)/testsuite/arcfour-test.c \
+	$(LIBNETTLE_DIR)/testsuite/arctwo-test.c \
+	$(LIBNETTLE_DIR)/testsuite/base16-test.c \
+	$(LIBNETTLE_DIR)/testsuite/base64-test.c \
+	$(LIBNETTLE_DIR)/testsuite/blowfish-test.c \
+	$(LIBNETTLE_DIR)/testsuite/buffer-test.c \
+	$(LIBNETTLE_DIR)/testsuite/camellia-test.c \
+	$(LIBNETTLE_DIR)/testsuite/cast128-test.c \
+	$(LIBNETTLE_DIR)/testsuite/cbc-test.c \
+	$(LIBNETTLE_DIR)/testsuite/ccm-test.c \
+	$(LIBNETTLE_DIR)/testsuite/cfb-test.c \
+	$(LIBNETTLE_DIR)/testsuite/chacha-poly1305-test.c \
+	$(LIBNETTLE_DIR)/testsuite/chacha-test.c \
+	$(LIBNETTLE_DIR)/testsuite/cmac-test.c \
+	$(LIBNETTLE_DIR)/testsuite/ctr-test.c \
+	$(LIBNETTLE_DIR)/testsuite/des-test.c \
+	$(LIBNETTLE_DIR)/testsuite/des3-test.c \
+	$(LIBNETTLE_DIR)/testsuite/eax-test.c \
+	$(LIBNETTLE_DIR)/testsuite/gcm-test.c \
+	$(LIBNETTLE_DIR)/testsuite/gosthash94-test.c \
+	$(LIBNETTLE_DIR)/testsuite/hkdf-test.c \
+	$(LIBNETTLE_DIR)/testsuite/hmac-test.c \
+	$(LIBNETTLE_DIR)/testsuite/knuth-lfib-test.c \
+	$(LIBNETTLE_DIR)/testsuite/md2-test.c \
+	$(LIBNETTLE_DIR)/testsuite/md4-test.c \
+	$(LIBNETTLE_DIR)/testsuite/md5-compat-test.c \
+	$(LIBNETTLE_DIR)/testsuite/md5-test.c \
+	$(LIBNETTLE_DIR)/testsuite/meta-aead-test.c \
+	$(LIBNETTLE_DIR)/testsuite/meta-armor-test.c \
+	$(LIBNETTLE_DIR)/testsuite/meta-cipher-test.c \
+	$(LIBNETTLE_DIR)/testsuite/meta-hash-test.c \
+	$(LIBNETTLE_DIR)/testsuite/meta-mac-test.c \
+	$(LIBNETTLE_DIR)/testsuite/pbkdf2-test.c \
+	$(LIBNETTLE_DIR)/testsuite/poly1305-test.c \
+	$(LIBNETTLE_DIR)/testsuite/ripemd160-test.c \
+	$(LIBNETTLE_DIR)/testsuite/salsa20-test.c \
+	$(LIBNETTLE_DIR)/testsuite/serpent-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha1-huge-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha1-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha3-224-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha3-256-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha3-384-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha3-512-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha3-permute-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha224-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha256-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha384-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha512-224-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha512-256-test.c \
+	$(LIBNETTLE_DIR)/testsuite/sha512-test.c \
+	$(LIBNETTLE_DIR)/testsuite/shake256-test.c \
+	$(LIBNETTLE_DIR)/testsuite/twofish-test.c \
+	$(LIBNETTLE_DIR)/testsuite/umac-test.c \
+	$(LIBNETTLE_DIR)/testsuite/xts-test.c \
+	$(LIBNETTLE_DIR)/testsuite/yarrow-test.c \
+	$(LIBNETTLE_DIR)/testsuite/testutils.c \
+	$(LIBNETTLE_DIR)/testsuite/testutils.h
+
+
+$(LIBNETTLE_DIR)/testsuite/.deps: $(LIBNETTLE_TEST_SRCS)
+	$(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR)/testsuite && cp $^ $(LIBNETTLE_DIR) && touch $@)
+
 LIBNETTLE_PREPARED_DEPS = \
 	$(LIBNETTLE_DIR)/.configured \
 	$(LIBNETTLE_DIR)/aes-decrypt-internal.s \
@@ -303,7 +426,8 @@ LIBNETTLE_PREPARED_DEPS = \
 	$(LIBNETTLE_DIR)/serpent-decrypt.s \
 	$(LIBNETTLE_DIR)/umac-nh.s \
 	$(LIBNETTLE_DIR)/umac-nh-n.s \
-	$(LIBNETTLE_DIR)/gcm-hash8.s
+	$(LIBNETTLE_DIR)/gcm-hash8.s \
+	$(LIBNETTLE_DIR)/testsuite/.deps 
 
 $(LIBNETTLE_BUILD)/.prepared : $(LIBNETTLE_PREPARED_DEPS)
 	$(call verbose_cmd,GEN,libnettle: $(notdir $@), cd $(LIBNETTLE_DIR) && touch $@)

@@ -2,3 +2,9 @@ menuconfig LIBNETTLE
     bool "libnettle: Symmetric and one-way cryptographic library"
     select LIBNEWLIBC
     default y
+
+if LIBNETTLE
+    config LIBNETTLE_TEST
+        bool "Provide test suite"
+        default n
+endif
