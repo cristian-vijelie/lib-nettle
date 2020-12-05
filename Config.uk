@@ -6,5 +6,10 @@ menuconfig LIBNETTLE
 if LIBNETTLE
     config LIBNETTLE_TEST
         bool "Provide test suite"
+
+        select LIBUK9P
+        select LIB9PFS
+        select LIBVFSCORE_AUTOMOUNT_ROOTFS
+
         default n
 endif
